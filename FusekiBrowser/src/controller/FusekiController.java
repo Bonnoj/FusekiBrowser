@@ -25,18 +25,35 @@ public class FusekiController {
 		
 		this.theView.addSelectionListener(new SelectListener());
 		this.theView.addConnectionListener(new ConnectionListener());
+		
+		
+		this.theView.addBackListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("test");
+				ArrayList<Object[]> data = theModel.goBackInStack();
+				theView.setTableData(data);
+				
+				if (theModel.isStackEmpty())
+				{
+					theView.setEnabledBackButton(false);
+				}
+			}
+		});
 	}
 	
 	class ConnectionListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
+			theView.setEnabledBackButton(false);
 			boolean connected = theModel.connect("");
 			
 			if (connected)
 			{
 				ArrayList<Object[]> data = theModel.execQuery(null);
-				theView.SetTableData(data);
+				theView.setTableData(data);
 			}
 			else {
 				// TODO not connected error
@@ -76,7 +93,8 @@ public class FusekiController {
     			}
     			
     			ArrayList<Object[]> data = theModel.execQuery(query);
-				theView.SetTableData(data);
+				theView.setTableData(data);
+				theView.setEnabledBackButton(true);
     	    }
     	}
 

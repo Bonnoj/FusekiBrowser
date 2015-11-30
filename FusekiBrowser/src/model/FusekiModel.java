@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -10,6 +11,7 @@ import org.apache.jena.query.ResultSet;
 public class FusekiModel {
 
 	private String url;
+	private Stack<String> backList;
 	
 	public FusekiModel()
 	{
@@ -19,10 +21,10 @@ public class FusekiModel {
 	// Connect to db
 	public boolean connect(String storename)
 	{
+		backList = new Stack<String>();	// Always reset stack when opening new connection
+		
 		// TODO add check if connection exists
 		url = "http://localhost:3030/russia/query";
-		
-		
 		return true;
 	}
 	
@@ -30,15 +32,16 @@ public class FusekiModel {
 	{
 		if (query == null)
 		{
-			query = "SELECT * WHERE {?x ?r ?y} LIMIT 5000";
+			query = "SELECT * WHERE {?x ?r ?y} LIMIT 5000";	// Default query
 		}
+		addToStack(query);
 		
 		ArrayList<Object[]> data = new ArrayList<Object[]>();
 		
 		QueryExecution qe = QueryExecutionFactory.sparqlService(url, query);
         ResultSet results = qe.execSelect();
 		
-        for ( ; results.hasNext() ; )	// Loop over resultset
+        for ( ; results.hasNext() ; )	// Loop resultset
         {
           QuerySolution soln = results.nextSolution() ;
           
@@ -48,10 +51,32 @@ public class FusekiModel {
           
           Object[] objs = { subject, predicate, object };
           data.add(objs);
-          //tableModel.addRow(objs);
         }
 
         qe.close();
         return data;
+	}
+	
+	// Double pop as current query will be re-added
+	public ArrayList<Object[]> goBackInStack()
+	{
+		backList.pop();
+		String query = backList.pop();
+		return execQuery(query);
+	}
+	
+	private void addToStack(String query)
+	{
+		backList.add(query);
+	}
+	
+	// Can't go back if there's only 1 item left in stack
+	public boolean isStackEmpty()
+	{
+		if (backList.size() == 1)
+		{
+			return true;
+		}
+		return false;
 	}
 }

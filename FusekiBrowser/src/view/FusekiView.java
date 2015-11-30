@@ -42,12 +42,12 @@ public class FusekiView extends JFrame
 	private JPanel createGUI()
 	{
 		JPanel panel = new JPanel();
-        panel.setBounds(10, 10, 960, 500);
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panel.setBounds(10, 10, 960, 500);
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		
 		contentpane = new JPanel();
 		contentpane.setLayout(null);
-        contentpane.add(panel);
+		contentpane.add(panel);
 		
         // Create tableModel an add it to table
 		tableModel = new DefaultTableModel(columnNames, 0);
@@ -58,7 +58,7 @@ public class FusekiView extends JFrame
 		mainTable.setRowSorter(rowSorter);
 		
 		panel.add(createConnectBar());
-        panel.add(new JLabel("Specify a word to match:"), BorderLayout.WEST);
+		panel.add(new JLabel("Specify a word to match:"), BorderLayout.WEST);
 		
 		JScrollPane srcpane = new JScrollPane(mainTable);
 		panel.add(srcpane);
@@ -82,6 +82,7 @@ public class FusekiView extends JFrame
 		
 		connectButton = new JButton("Connect");		
 		backButton = new JButton("Back");
+		backButton.setEnabled(false);
 		
 		connectPanel.add(backButton);
 		connectPanel.add(new JLabel("Vul de naam van RDF store in"));
@@ -92,7 +93,7 @@ public class FusekiView extends JFrame
 	}
 	
 	// Loads the RDF data to table
-	public void SetTableData(ArrayList<Object[]> data)
+	public void setTableData(ArrayList<Object[]> data)
 	{
 		// Always clear current data first
 		tableModel.setRowCount(0);
@@ -102,13 +103,25 @@ public class FusekiView extends JFrame
 		}
 	}
 	
-	// Adds eventlistener for connect button
+	// Enables or disables back button
+	public void setEnabledBackButton(boolean isEnabled)
+	{
+		backButton.setEnabled(isEnabled);
+	}
+	
+	// Adds event listener for back button
+	public void addBackListener(ActionListener actionListener)
+	{
+		backButton.addActionListener(actionListener);
+	}
+	
+	// Adds event listener for connect button
 	public void addConnectionListener(ActionListener actionListener)
 	{
 		connectButton.addActionListener(actionListener);
 	}
 	
-	// Adds eventlistener for table selections
+	// Adds event listener for table selections
 	public void addSelectionListener(MouseListener mouseListener)
 	{
 		mainTable.addMouseListener(mouseListener);
