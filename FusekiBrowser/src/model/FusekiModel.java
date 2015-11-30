@@ -21,10 +21,13 @@ public class FusekiModel {
 	// Connect to db
 	public boolean connect(String storename)
 	{
-		backList = new Stack<String>();	// Always reset stack when opening new connection
+		backList = new Stack<String>();	// Always reset stack when opening new connection		
 		
-		// TODO add check if connection exists
-		url = "http://localhost:3030/russia/query";
+		// TODO add check if connection exists & url is valid
+		url = storename;//"http://dbpedia.org/sparql";
+		
+		// hardcoded URL for testing
+		// url = "http://localhost:3030/russia/query";
 		return true;
 	}
 	
@@ -32,7 +35,7 @@ public class FusekiModel {
 	{
 		if (query == null)
 		{
-			query = "SELECT * WHERE {?x ?r ?y} LIMIT 5000";	// Default query
+			query = "SELECT * WHERE {?x ?r ?y} LIMIT 1000";	// Default query & max
 		}
 		addToStack(query);
 		
@@ -53,7 +56,7 @@ public class FusekiModel {
           data.add(objs);
         }
 
-        qe.close();
+        qe.close();        
         return data;
 	}
 	

@@ -78,7 +78,7 @@ public class FusekiView extends JFrame
 		
 		connectEntry = new JTextField(25);
 		connectEntry.setBounds(10,10,900,50);
-		connectEntry.setText("");
+		connectEntry.setText("http://dbpedia.org/sparql");
 		
 		connectButton = new JButton("Connect");		
 		backButton = new JButton("Back");
@@ -92,6 +92,11 @@ public class FusekiView extends JFrame
 		return connectPanel;
 	}
 	
+	public String getConnectEntryText()
+	{
+		return connectEntry.getText();
+	}
+	
 	// Loads the RDF data to table
 	public void setTableData(ArrayList<Object[]> data)
 	{
@@ -101,6 +106,8 @@ public class FusekiView extends JFrame
 		for (Object[] row: data){
 			tableModel.addRow(row);
 		}
+		
+		countLabel.setText("Rows: " + tableModel.getRowCount());
 	}
 	
 	// Enables or disables back button

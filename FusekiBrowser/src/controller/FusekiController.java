@@ -48,7 +48,8 @@ public class FusekiController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			theView.setEnabledBackButton(false);
-			boolean connected = theModel.connect("");
+			
+			boolean connected = theModel.connect(theView.getConnectEntryText());
 			
 			if (connected)
 			{
