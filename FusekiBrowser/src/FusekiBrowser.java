@@ -8,7 +8,7 @@ public class FusekiBrowser {
 		
 		FusekiView theView = new FusekiView();
 		FusekiModel theModel = new FusekiModel();
-		FusekiController theController = new FusekiController(theView, theModel);
+		new FusekiController(theView, theModel);
 		
 		theView.setVisible(true);
 	}

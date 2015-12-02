@@ -41,6 +41,7 @@ public class FusekiController {
 				}
 			}
 		});
+
 	}
 	
 	class ConnectionListener implements ActionListener{
@@ -69,9 +70,11 @@ public class FusekiController {
 		{
     		if (e.getClickCount() == 1) 
     		{
-    			System.out.println("REACHED!");
+    			clearTextFilters();
     			JTable target = (JTable)e.getSource();
-    			RowSorter rowSorter = target.getRowSorter();
+    			
+    			@SuppressWarnings("rawtypes")
+				RowSorter rowSorter = target.getRowSorter();
     			TableModel tableModel= target.getModel();
     			
     			// Retrieve selected location
@@ -81,7 +84,7 @@ public class FusekiController {
     			// Retrieve selected object	
     			row = rowSorter.convertRowIndexToModel(row); // conversion is needed when filters have been applied to table
     			Object selectedObject = tableModel.getValueAt(row, column);
-    			
+    			;
     			String query = "";
     			switch(column)
     			{
@@ -123,4 +126,53 @@ public class FusekiController {
 			
 		}		
 	}
+	
+	private void clearTextFilters()
+	{
+		theView.setObjectSearchEntryText("");
+		theView.setPredicateSearchEntryText("");
+		theView.setSubjectSearchEntryText("");
+	}
 }
+
+//SELECT ?subject ?predicate ?object
+//		WHERE {
+//		  ?subject ?predicate ?object . FILTER regex(str(?subject), "Mosc") .
+//		}
+//		LIMIT 1000
+
+/*
+this.theView.addFilterListener(new ActionListener()
+{
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		System.out.println("test2");
+		
+		//String subtext = theView.getSubjectSearchEntryText();
+		
+		String query = "";
+		int column = 0;
+		switch(column)
+		{
+			case 0: query = "SELECT * WHERE {?x ?r ?y .FILTER regex(str(?x), \"" + "Potter" + "\")}";
+			break;
+			case 1: query = "SELECT * WHERE {?x ?r ?y .FILTER (?r = <" + ">)}";
+			break;
+			case 2: query = "SELECT * WHERE {?x ?r ?y .FILTER (?y = <" + ">)}";
+			break;
+		}
+		
+		System.out.println(query);
+		
+		ArrayList<Object[]> data = theModel.execQuery(query);
+		theView.setTableData(data);
+		theView.setEnabledBackButton(true);
+		
+		theView.setTableData(data);
+		
+		if (theModel.isStackEmpty())
+		{
+			theView.setEnabledBackButton(false);
+		}
+	}
+});*/

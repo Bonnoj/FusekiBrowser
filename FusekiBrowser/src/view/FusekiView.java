@@ -1,6 +1,5 @@
 package view;
 
-import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
@@ -10,6 +9,9 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class FusekiView extends JFrame
 {
@@ -22,7 +24,12 @@ public class FusekiView extends JFrame
 	private JButton connectButton;
 	private JLabel countLabel;
 	
+	private JTextField subjectSearchEntry;
+	private JTextField predicateSearchEntry;
+	private JTextField objectSearchEntry;
+	
 	private JButton backButton;
+	private JButton filterButton;
 	
 	private String[] columnNames = {"Subject", "Predicate", "Object"};
 	private DefaultTableModel tableModel;
@@ -35,6 +42,7 @@ public class FusekiView extends JFrame
 		
 		contentpane = createGUI();
 		
+		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);	// Makes sure application actually terminates on closing
 		this.setContentPane(contentpane);
 		setSize(1000, 600);
 	}
@@ -55,18 +63,50 @@ public class FusekiView extends JFrame
 		
 		// Create rowsorter and add it to table
 		rowSorter = new TableRowSorter<>(mainTable.getModel());
-		mainTable.setRowSorter(rowSorter);
+		mainTable.setRowSorter(rowSorter);		
 		
 		panel.add(createConnectBar());
-		panel.add(new JLabel("Specify a word to match:"), BorderLayout.WEST);
-		
-		JScrollPane srcpane = new JScrollPane(mainTable);
-		panel.add(srcpane);
 		
 		countLabel = new JLabel("Not connected");
 		panel.add(countLabel);
 		
+		JScrollPane srcpane = new JScrollPane(mainTable);
+		panel.add(srcpane);
+		
+		JPanel searchPanel = new JPanel();
+		searchPanel.setBounds(0, 0, 960, 50);
+		searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.LINE_AXIS));
+		
+		subjectSearchEntry = new JTextField(25);
+		predicateSearchEntry = new JTextField(25);
+		objectSearchEntry = new JTextField(25);
+
+		searchPanel.add(createSearchPanel(subjectSearchEntry, "Subject"));
+		searchPanel.add(createSearchPanel(predicateSearchEntry, "Predicate"));
+		searchPanel.add(createSearchPanel(objectSearchEntry, "Object"));
+		panel.add(new JLabel("Local filter:"));
+		panel.add(searchPanel);
+		
+		//filterButton = new JButton("Filter");
+		//panel.add(filterButton);
+		
+		addLocalFilter(subjectSearchEntry, 0);
+		addLocalFilter(predicateSearchEntry, 1);
+		addLocalFilter(objectSearchEntry, 2);
+		
 		return contentpane;
+	}
+	
+	private JPanel createSearchPanel(JTextField target, String name)
+	{
+		JPanel myPanel = new JPanel();
+		myPanel.setLayout(new BoxLayout(myPanel, BoxLayout.Y_AXIS));
+		JLabel myLabel = new JLabel(name);
+		
+		myPanel.add(myLabel);
+		myPanel.add(target);
+		
+		return myPanel;
 	}
 	
 	// Add connect bar with entry and connect button
@@ -78,23 +118,105 @@ public class FusekiView extends JFrame
 		
 		connectEntry = new JTextField(25);
 		connectEntry.setBounds(10,10,900,50);
-		connectEntry.setText("http://dbpedia.org/sparql");
+		connectEntry.setText("http://localhost:3030/elvis/query");
+		//connectEntry.setText("http://dbpedia.org/sparql");
 		
 		connectButton = new JButton("Connect");		
 		backButton = new JButton("Back");
 		backButton.setEnabled(false);
 		
 		connectPanel.add(backButton);
-		connectPanel.add(new JLabel("Vul de naam van RDF store in"));
+		connectPanel.add(new JLabel("Vul de URL van RDF store in"));
 		connectPanel.add(connectEntry);
 		connectPanel.add(connectButton);
-		
+
 		return connectPanel;
+	}
+	
+	private void addLocalFilter(JTextField entry, int column)
+	{
+		entry.getDocument().addDocumentListener(new DocumentListener(){
+			
+	        @Override
+	        public void insertUpdate(DocumentEvent e) {
+	            String text = entry.getText();
+	
+	            if (text.trim().length() == 0) {
+	                rowSorter.setRowFilter(null);
+	            } else {
+	            	
+	            	RowFilter<TableModel, Object> rf = null;
+	                try { 
+	                    rf = RowFilter.regexFilter("(?i)" + text, column);    
+	                }  
+	                catch (java.util.regex.PatternSyntaxException ex)  
+	                {  
+	                    return;  
+	                }
+	                rowSorter.setRowFilter(rf);  
+	            }
+	        }
+	
+	        @Override
+	        public void removeUpdate(DocumentEvent e) {
+	            String text = entry.getText();
+	
+	            if (text.trim().length() == 0) {
+	                rowSorter.setRowFilter(null);
+	            } else {
+	            	RowFilter<TableModel, Object> rf = null;
+	                try { 
+	                    rf = RowFilter.regexFilter("(?i)" + text, column);    
+	                }  
+	                catch (java.util.regex.PatternSyntaxException ex)  
+	                {  
+	                    return;  
+	                }
+	                rowSorter.setRowFilter(rf);
+	            }
+	        }
+	
+	        @Override
+	        public void changedUpdate(DocumentEvent e) {
+	            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	        }
+
+	    });
 	}
 	
 	public String getConnectEntryText()
 	{
 		return connectEntry.getText();
+	}
+	
+	public String getObjectSearchEntryText()
+	{
+		return objectSearchEntry.getText();
+	}
+	
+	public String getPredicateSearchEntryText()
+	{
+		return predicateSearchEntry.getText();
+	}
+	
+	public String getSubjectSearchEntryText()
+	{
+		return subjectSearchEntry.getText();
+	}
+	
+	public void setObjectSearchEntryText(String text)
+	{
+		objectSearchEntry.setText(text);
+	}
+	
+	public void setPredicateSearchEntryText(String text)
+	{
+		predicateSearchEntry.setText(text);
+	}
+	
+	public void setSubjectSearchEntryText(String text)
+	{
+		subjectSearchEntry.setText(text);
 	}
 	
 	// Loads the RDF data to table
@@ -114,6 +236,11 @@ public class FusekiView extends JFrame
 	public void setEnabledBackButton(boolean isEnabled)
 	{
 		backButton.setEnabled(isEnabled);
+	}
+	
+	public void addFilterListener(ActionListener actionListener)
+	{
+		filterButton.addActionListener(actionListener);	
 	}
 	
 	// Adds event listener for back button

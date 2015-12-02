@@ -24,7 +24,7 @@ public class FusekiModel {
 		backList = new Stack<String>();	// Always reset stack when opening new connection		
 		
 		// TODO add check if connection exists & url is valid
-		url = storename;//"http://dbpedia.org/sparql";
+		url = storename;	//"http://dbpedia.org/sparql";
 		
 		// hardcoded URL for testing
 		// url = "http://localhost:3030/russia/query";
@@ -35,7 +35,7 @@ public class FusekiModel {
 	{
 		if (query == null)
 		{
-			query = "SELECT * WHERE {?x ?r ?y} LIMIT 1000";	// Default query & max
+			query = "SELECT * WHERE {?x ?r ?y} LIMIT 5000";	// Default query & max
 		}
 		addToStack(query);
 		
@@ -50,7 +50,7 @@ public class FusekiModel {
           
           String subject = soln.get("?x").toString();       // Get a result variable by name.
           String predicate = soln.get("?r").toString();       // Get a result variable by name.
-          String object = soln.get("?y").toString();       // Get a result variable by name.
+          String object = soln.get("?y").toString();       // Get a result variable by name.          
           
           Object[] objs = { subject, predicate, object };
           data.add(objs);
